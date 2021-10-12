@@ -7,7 +7,7 @@
   tasks:
     - name: Set Hostname
       hostname: name={{ pi_name }}
-    
+
     - name: Fix Hostname in hosts file
       lineinfile:
         path: /etc/hosts
@@ -24,7 +24,7 @@
         state: present
 
     - name: Create new user
-      user: 
+      user:
         name: "{{ ansible_user }}"
         password: "{{ ansible_pass |password_hash('md5') }}"
         shell: /bin/bash
@@ -32,7 +32,7 @@
         update_password: on_create
 
     - name: Add group to sudoers
-      copy: 
+      copy:
         dest: /etc/sudoers.d/admin-group-nopasswd
         content: "%admin ALL=(ALL) NOPASSWD:ALL"
         force: yes
@@ -48,7 +48,8 @@
         group: "{{ autostart_user }}"
         groups: audio,video,plugdev,games,users,input
         append: no
-      
+      ignore_errors: yes
+
     - name: Add authorized_keys for the user
       authorized_key: user={{ ansible_user }} key="{{ lookup('file', item) }}"
       with_items:
@@ -74,9 +75,9 @@
       meta: flush_handlers
 
     - name: Install required packages
-      apt: 
+      apt:
         name: "{{ required_packages }}"
-  
+
     - name: Ensure locales are generated
       locale_gen:
         name: "{{ item }}"
@@ -92,7 +93,7 @@
         - "{{ ufw_allowed_ports }}"
 
     - name: Enable ufw/firewall
-      ufw: 
+      ufw:
         state: enabled
 
     - name: HDMI force hotplug
@@ -102,6 +103,7 @@
         line: "hdmi_force_hotplug=1"
         state: present
       notify: Reboot
+      ignore_errors: yes
 
     - name: HDMI normal mode
       lineinfile:
@@ -110,6 +112,7 @@
         line: "#hdmi_drive=2"
         state: present
       notify: Reboot
+      ignore_errors: yes
 
     - name: HDMI group
       lineinfile:
@@ -118,6 +121,7 @@
         line: "hdmi_group=2"
         state: present
       notify: Reboot
+      ignore_errors: yes
 
     - name: HDMI mode FullHD
       lineinfile:
@@ -126,6 +130,7 @@
         line: "hdmi_mode=82"
         state: present
       notify: Reboot
+      ignore_errors: yes
 
     - name: Underclock CPU to keep it from cooking
       lineinfile:
@@ -134,6 +139,7 @@
         line: "arm_freq=700"
         state: present
       notify: Reboot
+      ignore_errors: yes
 
   handlers:
     - name: Restart ssh

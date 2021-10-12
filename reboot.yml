@@ -1,0 +1,10 @@
+---
+- name: Reboot Pi
+  hosts: all
+  become: true
+  become_user: root
+
+  tasks:
+    - name: Reboot
+      reboot:
+        reboot_timeout: 3600

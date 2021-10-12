@@ -6,7 +6,7 @@
 
   tasks:
   - name: Install packages
-    apt: 
+    apt:
       state: present
       name: "{{ packages }}"
     vars:
@@ -19,7 +19,7 @@
       - openbox
       - hsetroot
       - x11vnc
-      - chromium-browser
+      - chromium
       - pulseaudio
       - xrdp
       - cec-utils
@@ -31,7 +31,7 @@
       line: "NTP={{ ntpserver }}"
       state: present
     notify: Activate ntp
-  
+
   - name: Ensure X starts on login
     lineinfile:
       path: /home/{{ autostart_user }}/.bash_profile
@@ -50,7 +50,7 @@
     shell: sudo -u {{ autostart_user|quote}}  x11vnc -storepasswd {{ vnc_pass|quote }}  /home/{{ autostart_user|quote }}/.x11vnc/passwd
     args:
       creates: /home/{{ autostart_user }}/.x11vnc/passwd
-  
+
   - name: Ensure openbox config dir exists
     file:
       path: /home/{{ autostart_user }}/.config/openbox/
@@ -96,7 +96,7 @@
       - { line: "ExecStart=" }
       - { line: "ExecStart=-/sbin/agetty --autologin {{ autostart_user }} --noclear %I $TERM" }
     notify: Restart getty
-  
+
   - name: Setup xrdp
     copy:
       src: files/xrdp.ini
@@ -109,24 +109,27 @@
       groups: ssl-cert
       append: yes
 
-  - name: Set up cron job for switching monitor on every day
-    cron:
-      name: "Switch monitor on"
-      hour: "{{ power_on_hour }}"
-      minute: "{{ power_on_minute }}"
-      weekday: "{{ power_weekdays }}"
-      user: pi
-      job: "echo on 0 | cec-client -s -d 1 > /dev/null"
+  - name: Set up cron jobs for switching monitors on and off during the day
+    block:
+      - name: Switch monitor on
+        cron:
+          name: "Switch monitor on"
+          hour: "{{ power_on_hour }}"
+          minute: "{{ power_on_minute }}"
+          weekday: "{{ power_weekdays }}"
+          user: pi
+          job: "echo on 0 | cec-client -s -d 1 > /dev/null"
 
-  - name: Set up cron job for switching monitor off every day
-    cron:
-      name: "Switch monitor off"
-      hour: "{{ power_off_hour }}"
-      minute: "{{ power_off_minute }}"
-      weekday: "{{ power_weekdays }}"
-      user: pi
-      job: "echo standby 0 | cec-client -s -d 1 > /dev/null"
-        
+      - name: Switch monitor off
+        cron:
+          name: "Switch monitor off"
+          hour: "{{ power_off_hour }}"
+          minute: "{{ power_off_minute }}"
+          weekday: "{{ power_weekdays }}"
+          user: pi
+          job: "echo standby 0 | cec-client -s -d 1 > /dev/null"
+    when: use_cron|bool == true
+
   - name: Remove the nopassword-config for the pi user if it exists
     file:
       path: "/etc/sudoers.d/010_pi-nopasswd"
@@ -135,9 +138,9 @@
   handlers:
   - name: Restart getty
     include: tasks/restart_getty.yml
-  
+
   - name: Restart xrdp
     include: tasks/restart_xrdp.yml
-  
+
   - name: Activate ntp
     include: tasks/activate_ntp.yml

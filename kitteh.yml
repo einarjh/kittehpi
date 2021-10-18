@@ -23,6 +23,7 @@
       - pulseaudio
       - xrdp
       - cec-utils
+      - fonts-open-sans
 
   - name: Ensure we're using the correct ntp server
     lineinfile:

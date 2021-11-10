@@ -71,6 +71,11 @@
         state: present
       notify: Restart ssh
 
+    - name: Ensure contrib and non-free repo is added
+      apt_repository:
+        repo: deb http://deb.debian.org/debian/ bullseye main contrib non-free
+        state: present
+
     - name: Flush handlers at this point
       meta: flush_handlers
 

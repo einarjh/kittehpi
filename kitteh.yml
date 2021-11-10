@@ -118,7 +118,7 @@
           hour: "{{ power_on_hour }}"
           minute: "{{ power_on_minute }}"
           weekday: "{{ power_weekdays }}"
-          user: pi
+          user: "{{ autostart_user }}"
           job: "echo on 0 | cec-client -s -d 1 > /dev/null"
 
       - name: Switch monitor off
@@ -127,7 +127,7 @@
           hour: "{{ power_off_hour }}"
           minute: "{{ power_off_minute }}"
           weekday: "{{ power_weekdays }}"
-          user: pi
+          user: "{{ autostart_user }}"
           job: "echo standby 0 | cec-client -s -d 1 > /dev/null"
     when: use_cron|bool == true
 

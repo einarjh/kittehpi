@@ -75,6 +75,7 @@
       apt_repository:
         repo: deb http://deb.debian.org/debian/ bullseye main contrib non-free
         state: present
+      when: ansible_facts['lsb']['id'] != "Raspbian"
 
     - name: Flush handlers at this point
       meta: flush_handlers

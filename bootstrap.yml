@@ -82,7 +82,7 @@
       apt_repository:
         repo: deb http://deb.debian.org/debian/ bullseye main contrib non-free
         state: present
-      when: ansible_facts['lsb']['id'] != "Raspbian"
+      when: ansible_facts['lsb']['id'] != 'Raspbian'
 
     - name: Flush handlers at this point
       meta: flush_handlers
@@ -116,7 +116,7 @@
         line: "hdmi_force_hotplug=1"
         state: present
       notify: Reboot
-      ignore_errors: yes
+      when: ansible_facts['lsb']['id'] == 'Raspbian'
 
     - name: HDMI normal mode
       lineinfile:
@@ -125,7 +125,7 @@
         line: "#hdmi_drive=2"
         state: present
       notify: Reboot
-      ignore_errors: yes
+      when: ansible_facts['lsb']['id'] == 'Raspbian'
 
     - name: HDMI group
       lineinfile:
@@ -134,7 +134,7 @@
         line: "hdmi_group=2"
         state: present
       notify: Reboot
-      ignore_errors: yes
+      when: ansible_facts['lsb']['id'] == 'Raspbian'
 
     - name: HDMI mode FullHD
       lineinfile:
@@ -143,7 +143,7 @@
         line: "hdmi_mode=82"
         state: present
       notify: Reboot
-      ignore_errors: yes
+      when: ansible_facts['lsb']['id'] == 'Raspbian'
 
     - name: Underclock CPU to keep it from cooking
       lineinfile:
@@ -152,7 +152,7 @@
         line: "arm_freq=700"
         state: present
       notify: Reboot
-      ignore_errors: yes
+      when: ansible_facts['lsb']['id'] == 'Raspbian'
 
   handlers:
     - name: Restart ssh
@@ -162,4 +162,4 @@
       shell: sleep 2 && shutdown -r now "Ansible updates triggered"
       async: 1
       poll: 0
-      ignore_errors: true
+      ignore_errors: yes

@@ -20,10 +20,21 @@
       - openbox
       - hsetroot
       - x11vnc
-      - chromium-browser
       - pulseaudio
       - cec-utils
       - fonts-open-sans
+
+  - name: Install Chromium on Raspbian
+    apt:
+      state: present
+      name: chromium-browser
+    when: ansible_facts['lsb']['id'] == 'Raspbian'
+
+  - name: Install Chromium on regular Debian
+    apt:
+      state: present
+      name: chromium
+    when: ansible_facts['lsb']['id'] != 'Raspbian'
 
   - name: Install specific xrdp version on debian 11
     apt:

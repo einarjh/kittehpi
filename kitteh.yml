@@ -24,6 +24,12 @@
       - cec-utils
       - fonts-open-sans
 
+  - name: Install systemd-timesyncd
+    apt:
+      state: present
+      name: systemd-timesyncd
+    when: ansible_distribution_version | int >= 11
+
   - name: Install Chromium on Raspbian
     apt:
       state: present
@@ -54,6 +60,14 @@
       name: xrdp
       selection: hold
     when: ansible_distribution == 'Debian' and ansible_distribution_version == '11'
+
+  - name: Ensure the timesyncd conf file exists
+    lineinfile:
+      path: /etc/systemd/timesyncd.conf
+      line: "[Time]"
+      state: present
+      create: yes
+    notify: Activate ntp
 
   - name: Ensure we're using the correct ntp server
     lineinfile:
@@ -149,7 +163,7 @@
           minute: "{{ power_on_minute }}"
           weekday: "{{ power_weekdays }}"
           user: "{{ autostart_user }}"
-          job: "echo on 0 | cec-client -s -d 1 > /dev/null"
+          job: "echo on 0 | cec-client -s -d 0 > /dev/null"
 
       - name: Switch monitor off
         cron:
@@ -158,7 +172,7 @@
           minute: "{{ power_off_minute }}"
           weekday: "{{ power_weekdays }}"
           user: "{{ autostart_user }}"
-          job: "echo standby 0 | cec-client -s -d 1 > /dev/null"
+          job: "echo standby 0 | cec-client -s -d 0 > /dev/null"
     when: use_cron|bool == true
 
   - name: Remove the nopassword-config for the pi user if it exists
@@ -168,10 +182,10 @@
 
   handlers:
   - name: Restart getty
-    include: tasks/restart_getty.yml
+    include_tasks: tasks/restart_getty.yml
 
   - name: Restart xrdp
-    include: tasks/restart_xrdp.yml
+    include_tasks: tasks/restart_xrdp.yml
 
   - name: Activate ntp
-    include: tasks/activate_ntp.yml
+    include_tasks: tasks/activate_ntp.yml

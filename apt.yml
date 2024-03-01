@@ -14,7 +14,7 @@
 
     - name: check if a reboot is required
       register: reboot
-      stat: path=/var/run/reboot-required get_md5=no
+      stat: path=/var/run/reboot-required
 
     - name: restart server
       shell: sleep 2 && shutdown -r now "Ansible updates triggered"

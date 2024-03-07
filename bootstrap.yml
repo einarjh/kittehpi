@@ -53,7 +53,7 @@
         name: "{{ autostart_user }}"
         shell: /bin/bash
         group: "{{ autostart_user }}"
-        groups: audio,video,plugdev,games,users,input
+        groups: audio,video,plugdev,games,users,input,dialout
         append: no
       ignore_errors: yes
 
